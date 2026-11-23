@@ -1,0 +1,55 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: englishcraft
+      POSTGRES_USER: englishcraft
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?required}
+    volumes:
+      - data:/var/lib/postgresql/data
+    networks: [private]
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U englishcraft -d englishcraft"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+  app:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgres://englishcraft:${POSTGRES_PASSWORD:?required}@postgres:5432/englishcraft?sslmode=disable
+      COOKIE_SECURE: "true"
+      AUTO_MIGRATE: "false"
+      AI_PROVIDER: ${AI_PROVIDER:-disabled}
+      AI_TEXT_MODEL: ${AI_TEXT_MODEL:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      MISTRAL_API_KEY: ${MISTRAL_API_KEY:-}
+      VOICE_ENABLED: ${VOICE_ENABLED:-false}
+      AI_VOICE_MODEL: ${AI_VOICE_MODEL:-gpt-realtime-2.1}
+      VOICE_MAX_SECONDS: ${VOICE_MAX_SECONDS:-300}
+      VOICE_DAILY_SECONDS: ${VOICE_DAILY_SECONDS:-900}
+      AI_PROVIDER_DAILY_MICROS: ${AI_PROVIDER_DAILY_MICROS:-0}
+      AI_STUDENT_DAILY_MICROS: ${AI_STUDENT_DAILY_MICROS:-0}
+      AI_TEXT_RESERVE_MICROS: ${AI_TEXT_RESERVE_MICROS:-0}
+      AI_VOICE_RESERVE_MICROS: ${AI_VOICE_RESERVE_MICROS:-0}
+    expose: ["8080"]
+    networks: [private, dokploy-network]
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 256m
+    cpus: 1
+networks:
+  private:
+    internal: true
+  dokploy-network:
+    external: true
+volumes:
+  data:

@@ -1,0 +1,10 @@
+<!doctype html>
+<html lang="fr">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Alex — laboratoire vocal</title><link rel="stylesheet" href="/style.css"></head>
+<body><main><h1>Alex — test vocal</h1><p>ElevenLabs Speech Engine + Mistral Large 4</p>
+<p>Test adulte isolé, sans compte élève, sans XP ni accès à la base EnglishCraft. Une session de 60 secondes maximum. Ne communique aucune donnée personnelle.</p>
+<p>Le micro envoie ta voix à ElevenLabs ; le texte transcrit est envoyé à Mistral. Aucun transcript n’est journalisé localement. Le fournisseur vocal est configuré sans enregistrement audio, avec une rétention de 1 jour et suppression des transcripts/PII activée ; ce n’est pas une garantie de zéro rétention fournisseur.</p>
+<p id="status" role="status">Prêt. Alex attend que tu parles en premier.</p><p id="captions" aria-live="polite"></p>
+<button id="start">Démarrer le test (60 s)</button> <button id="stop" disabled>Arrêter</button>
+<p>Essaie : “Hello Alex, can we practise the past tense?” Puis interromps Alex pour vérifier la fluidité.</p>
+</main><script type="module" src="/client.js"></script></body></html>

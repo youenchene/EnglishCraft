@@ -1,0 +1,328 @@
+openapi: 3.1.0
+info:
+  title: EnglishCraft Core
+  version: 1.0.0
+  description: Family-only deterministic learning with optional advisory AI. No public registration. Mutations require same-origin cookies; parent and child permissions are enforced server-side. Tutoring extensions are described in docs/tutoring-api.md.
+servers:
+  - url: /api/v1
+security:
+  - familySession: []
+paths:
+  /auth/login:
+    post:
+      operationId: login
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [username, password]
+              properties:
+                username: { type: string, maxLength: 80 }
+                password: { type: string, maxLength: 72 }
+      responses:
+        '200':
+          description: Authenticated; Set-Cookie contains a HttpOnly, SameSite=Strict session (Secure in HTTPS).
+          content: { application/json: { schema: { $ref: '#/components/schemas/User' } } }
+        '400': { $ref: '#/components/responses/Error' }
+        '401': { $ref: '#/components/responses/Error' }
+        '403': { $ref: '#/components/responses/Error' }
+        '500': { $ref: '#/components/responses/Error' }
+  /auth/logout:
+    post:
+      operationId: logout
+      security: []
+      responses:
+        '204': { description: Session revoked and cookie cleared; also succeeds without a cookie. }
+        '403': { $ref: '#/components/responses/Error' }
+        '500': { $ref: '#/components/responses/Error' }
+  /auth/me:
+    get:
+      operationId: currentUser
+      responses:
+        '200':
+          description: Current identity
+          content: { application/json: { schema: { $ref: '#/components/schemas/User' } } }
+        '401': { $ref: '#/components/responses/Error' }
+  /skills:
+    get:
+      operationId: listSkills
+      responses:
+        '200':
+          description: Skills in the versioned curriculum
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required: [id, title]
+                  properties: { id: { type: string }, title: { type: string } }
+        '401': { $ref: '#/components/responses/Error' }
+  /verbs:
+    get:
+      operationId: listVerbs
+      responses:
+        '200':
+          description: Teaching cards, including answers for deliberate revision
+          content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Verb' } } } }
+        '401': { $ref: '#/components/responses/Error' }
+  /missions:
+    get:
+      operationId: listMissions
+      responses:
+        '200':
+          description: Available versioned adventures
+          content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/Mission' } } } }
+        '401': { $ref: '#/components/responses/Error' }
+  /missions/{id}/start:
+    parameters:
+      - { $ref: '#/components/parameters/MissionID' }
+    post:
+      operationId: startMission
+      description: Child only. Idempotent start resumes existing progress, including completed missions.
+      responses:
+        '200': { $ref: '#/components/responses/Step' }
+        '401': { $ref: '#/components/responses/Error' }
+        '403': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+        '500': { $ref: '#/components/responses/Error' }
+  /missions/{id}/current:
+    parameters:
+      - { $ref: '#/components/parameters/MissionID' }
+    get:
+      operationId: currentMissionStep
+      description: Child only. Exercise contains no accepted-answer list.
+      responses:
+        '200': { $ref: '#/components/responses/Step' }
+        '401': { $ref: '#/components/responses/Error' }
+        '403': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+        '500': { $ref: '#/components/responses/Error' }
+  /answers:
+    post:
+      operationId: submitAnswer
+      description: Child only. Atomically records evidence, reward, mission state, review and receipt. Retry the same key and payload after a lost response. Reusing a key for changed content or submitting a stale step returns 409. Incorrect mission answers remain on the step. Open answers grant no XP or mastery.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [exerciseId, answer, idempotencyKey]
+              properties:
+                missionId: { type: string, default: '' }
+                step: { type: integer, minimum: 0, default: 0 }
+                exerciseId: { type: string }
+                answer: { type: string, minLength: 1, maxLength: 500 }
+                idempotencyKey: { type: string, minLength: 16, maxLength: 100 }
+      responses:
+        '200':
+          description: Authoritative correction and reward
+          content: { application/json: { schema: { $ref: '#/components/schemas/Result' } } }
+        '400': { $ref: '#/components/responses/Error' }
+        '401': { $ref: '#/components/responses/Error' }
+        '403': { $ref: '#/components/responses/Error' }
+        '404': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+        '500': { $ref: '#/components/responses/Error' }
+  /training:
+    get:
+      operationId: nextTraining
+      description: Child only. Overdue failed verbs first, then undiscovered verbs. Null means all verbs are cooling down.
+      responses:
+        '200':
+          description: Selected exercise or null
+          content:
+            application/json:
+              schema: { oneOf: [{ $ref: '#/components/schemas/Exercise' }, { type: 'null' }] }
+        '401': { $ref: '#/components/responses/Error' }
+        '403': { $ref: '#/components/responses/Error' }
+        '500': { $ref: '#/components/responses/Error' }
+  /progress:
+    get:
+      operationId: childProgress
+      description: Child's own progress, XP and recent history.
+      responses:
+        '200': { $ref: '#/components/responses/Summary' }
+        '401': { $ref: '#/components/responses/Error' }
+        '403': { $ref: '#/components/responses/Error' }
+        '500': { $ref: '#/components/responses/Error' }
+  /reviews:
+    get:
+      operationId: childReviews
+      description: Same summary as /progress; due lists skill IDs ordered by failures then due time.
+      responses:
+        '200': { $ref: '#/components/responses/Summary' }
+        '401': { $ref: '#/components/responses/Error' }
+        '403': { $ref: '#/components/responses/Error' }
+        '500': { $ref: '#/components/responses/Error' }
+  /parent/results:
+    get:
+      operationId: parentResults
+      description: Parent only. Selected child must belong to the authenticated parent; omission selects a deterministic default.
+      parameters:
+        - { name: child, in: query, schema: { type: string } }
+      responses:
+        '200': { $ref: '#/components/responses/Summary' }
+        '401': { $ref: '#/components/responses/Error' }
+        '403': { $ref: '#/components/responses/Error' }
+        '500': { $ref: '#/components/responses/Error' }
+  /parent/children:
+    get:
+      operationId: listChildren
+      description: Lists only children belonging to the authenticated parent.
+      responses:
+        '200':
+          description: Child profiles, without credentials
+          content: { application/json: { schema: { type: array, items: { $ref: '#/components/schemas/ChildProfile' } } } }
+        '401': { $ref: '#/components/responses/Error' }
+        '403': { $ref: '#/components/responses/Error' }
+        '500': { $ref: '#/components/responses/Error' }
+    post:
+      operationId: addChild
+      description: Parent only. Creates child account and empty learning state atomically. Password length is 12–72 UTF-8 bytes.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              additionalProperties: false
+              required: [username, password]
+              properties:
+                username: { type: string, pattern: '^[A-Za-z0-9_.-]{3,80}$' }
+                password: { type: string, minLength: 12, maxLength: 72, writeOnly: true }
+      responses:
+        '201':
+          description: Created child profile
+          content: { application/json: { schema: { $ref: '#/components/schemas/ChildProfile' } } }
+        '400': { $ref: '#/components/responses/Error' }
+        '401': { $ref: '#/components/responses/Error' }
+        '403': { $ref: '#/components/responses/Error' }
+        '409': { $ref: '#/components/responses/Error' }
+        '500': { $ref: '#/components/responses/Error' }
+components:
+  securitySchemes:
+    familySession: { type: apiKey, in: cookie, name: englishcraft_session }
+  parameters:
+    MissionID: { name: id, in: path, required: true, schema: { type: string } }
+  responses:
+    Error:
+      description: Invalid request, unauthenticated, forbidden, missing content, stale submission, or server error (see status).
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    Step:
+      description: Current mission step, or completion without an exercise
+      content: { application/json: { schema: { $ref: '#/components/schemas/Step' } } }
+    Summary:
+      description: Persisted student progress and due revisions
+      content: { application/json: { schema: { $ref: '#/components/schemas/Summary' } } }
+  schemas:
+    ChildProfile:
+      type: object
+      required: [id, username]
+      properties: { id: { type: string }, username: { type: string } }
+    User:
+      type: object
+      required: [id, role]
+      properties: { id: { type: string }, role: { type: string, enum: [parent, child] } }
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties: { code: { type: string }, message: { type: string } }
+    Verb:
+      type: object
+      required: [base, past, participle, translation, difficulty, categories, examples]
+      properties:
+        base: { type: string }
+        past: { type: string, description: Slash-separated accepted standalone variants. }
+        participle: { type: string }
+        translation: { type: string }
+        difficulty: { type: integer, minimum: 1, maximum: 3 }
+        categories: { type: array, items: { type: string } }
+        examples: { type: array, minItems: 2, items: { type: string } }
+    Mission:
+      type: object
+      required: [id, title, theme, version, steps]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        theme: { type: string }
+        version: { type: integer, minimum: 1 }
+        steps: { type: integer, minimum: 1 }
+    Exercise:
+      type: object
+      required: [id, kind, prompt, skill, verb]
+      properties:
+        id: { type: string }
+        kind: { type: string, enum: [past_simple, past_participle, fill_blank, incorrect_form, build_sentence] }
+        prompt: { type: string }
+        skill: { type: string }
+        verb: { type: string }
+    Step:
+      type: object
+      required: [missionId, title, theme, step, total, completed, dialogue, exercise]
+      properties:
+        missionId: { type: string }
+        title: { type: string }
+        theme: { type: string }
+        step: { type: integer, minimum: 0 }
+        total: { type: integer, minimum: 1 }
+        completed: { type: boolean }
+        dialogue: { type: string }
+        exercise: { oneOf: [{ $ref: '#/components/schemas/Exercise' }, { type: 'null' }] }
+    Result:
+      type: object
+      required: [status, expected, xp, completed, nextStep]
+      properties:
+        status: { type: string, enum: [correct, incorrect, needs_evaluation] }
+        expected: { type: string }
+        xp: { type: integer, minimum: 0 }
+        completed: { type: boolean }
+        nextStep: { type: integer, minimum: 0 }
+    MissionProgress:
+      type: object
+      required: [version, step, xp, completed]
+      properties:
+        version: { type: integer }
+        step: { type: integer, minimum: 0 }
+        xp: { type: integer, minimum: 0 }
+        completed: { type: boolean }
+    Review:
+      type: object
+      required: [stage, streak, attempts, failures, due, last]
+      properties:
+        stage: { type: string, enum: [discovery, learning, mastery] }
+        streak: { type: integer, minimum: 0 }
+        attempts: { type: integer, minimum: 0 }
+        failures: { type: integer, minimum: 0 }
+        due: { type: string, format: date-time }
+        last: { type: string, format: date-time }
+    Attempt:
+      type: object
+      required: [exerciseId, skill, answer, status, expected, at]
+      properties:
+        exerciseId: { type: string }
+        skill: { type: string }
+        answer: { type: string }
+        status: { type: string, enum: [correct, incorrect, needs_evaluation] }
+        expected: { type: string }
+        at: { type: string, format: date-time }
+    Summary:
+      type: object
+      required: [xp, missions, reviews, due, history, errors]
+      properties:
+        xp: { type: integer, minimum: 0 }
+        missions: { type: object, additionalProperties: { $ref: '#/components/schemas/MissionProgress' } }
+        reviews: { type: object, additionalProperties: { $ref: '#/components/schemas/Review' } }
+        due: { type: array, items: { type: string } }
+        history: { type: array, maxItems: 20, items: { $ref: '#/components/schemas/Attempt' } }
+        errors: { type: object, additionalProperties: { type: integer, minimum: 0 } }

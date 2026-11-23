@@ -1,0 +1,6 @@
+# Overlay for a fresh UI regression family without resetting the active demo.
+services:
+  postgres:
+    ports: !override ["127.0.0.1:55434:5432"]
+  app:
+    ports: !override ["127.0.0.1:18081:8080"]

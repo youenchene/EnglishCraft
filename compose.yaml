@@ -1,0 +1,45 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: englishcraft
+      POSTGRES_USER: englishcraft
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local-development-only}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U englishcraft -d englishcraft"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  app:
+    build: .
+    environment:
+      APP_ADDRESS: ":8080"
+      DATABASE_URL: postgres://englishcraft:${POSTGRES_PASSWORD:-local-development-only}@postgres:5432/englishcraft?sslmode=disable
+      COOKIE_SECURE: ${COOKIE_SECURE:-false}
+      AI_PROVIDER: ${AI_PROVIDER:-disabled}
+      AI_TEXT_MODEL: ${AI_TEXT_MODEL:-}
+      AI_VOICE_MODEL: ${AI_VOICE_MODEL:-}
+      VOICE_ENABLED: ${VOICE_ENABLED:-false}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      MISTRAL_API_KEY: ${MISTRAL_API_KEY:-}
+      AI_PROVIDER_DAILY_MICROS: ${AI_PROVIDER_DAILY_MICROS:-0}
+      AI_STUDENT_DAILY_MICROS: ${AI_STUDENT_DAILY_MICROS:-0}
+      AI_TEXT_RESERVE_MICROS: ${AI_TEXT_RESERVE_MICROS:-0}
+      AI_VOICE_RESERVE_MICROS: ${AI_VOICE_RESERVE_MICROS:-0}
+      VOICE_MAX_SECONDS: ${VOICE_MAX_SECONDS:-300}
+      VOICE_DAILY_SECONDS: ${VOICE_DAILY_SECONDS:-900}
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
