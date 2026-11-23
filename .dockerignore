@@ -1,0 +1,16 @@
+.git
+.env
+**/.env*
+graphify-out
+web/node_modules
+**/node_modules
+scripts/voice-lab/dist
+scripts/voice-lab/.runtime.json
+web/coverage
+web/test-results
+web/playwright-report
+**/*.dump
+web/test-results
+web/playwright-report
+**/*.dump
+bin

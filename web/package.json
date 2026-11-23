@@ -1,0 +1,42 @@
+{
+  "name": "englishcraft-web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "lint": "eslint ."
+  },
+  "dependencies": {
+    "@elevenlabs/client": "1.28.0",
+    "@vitejs/plugin-react": "5.1.2",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "typescript": "5.9.3",
+    "vite": "7.3.7",
+    "vite-plugin-pwa": "1.0.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.5",
+    "@playwright/test": "1.64.0",
+    "@tailwindcss/postcss": "4.3.3",
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "16.3.0",
+    "@types/node": "24.10.0",
+    "@types/react": "18.3.18",
+    "@types/react-dom": "18.3.5",
+    "@typescript-eslint/eslint-plugin": "8.71.2",
+    "@typescript-eslint/parser": "8.71.2",
+    "eslint": "9.39.5",
+    "eslint-plugin-react-hooks": "5.2.0",
+    "eslint-plugin-react-refresh": "0.4.18",
+    "globals": "15.14.0",
+    "jsdom": "27.0.1",
+    "postcss": "8.5.30",
+    "tailwindcss": "4.3.3",
+    "vitest": "4.1.11"
+  }
+}

@@ -1,0 +1,13 @@
+.env
+.DS_Store
+bin/
+graphify-out/
+web/node_modules/
+web/coverage/
+web/playwright-report/
+web/test-results/
+web/*.tsbuildinfo
+/scripts/voice-lab/node_modules/
+/scripts/voice-lab/dist/
+/scripts/voice-lab/.runtime.json
+internal/learning/adapters/httpapi/web/dist/

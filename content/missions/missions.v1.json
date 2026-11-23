@@ -1,0 +1,25 @@
+{
+ "version":1,
+ "missions":[
+  {"id":"lost-diamond","title":"Minecraft : The Lost Diamond","theme":"forest","steps":[
+   {"dialogue":"Alex : Le diamant a disparu ! Raconte comment nous sommes arrivés à la grotte.","xp":10,"exercise":{"id":"diamond-go","kind":"past_simple","prompt":"Donne le prétérit de go.","skill":"english.irregular.go","verb":"go","accepted":["went"]}},
+   {"dialogue":"Alex : Nous avons trouvé une piste près du pont.","xp":10,"exercise":{"id":"diamond-found","kind":"fill_blank","prompt":"Complète : Yesterday, Alex ___ a diamond. (find)","skill":"english.irregular.find","verb":"find","accepted":["found"]}},
+   {"dialogue":"Alex : Quelqu'un a construit ce pont. Lis bien les trois formes.","xp":10,"exercise":{"id":"diamond-error","kind":"incorrect_form","prompt":"Identifie la forme incorrecte : built / builded / build.","skill":"english.irregular.build","verb":"build","accepted":["builded"]}},
+   {"dialogue":"Alex : Le coffre est ouvert ! Complète notre récit.","xp":15,"exercise":{"id":"diamond-taken","kind":"past_participle","prompt":"Donne le participe passé de take.","skill":"english.irregular.take","verb":"take","accepted":["taken"]}},
+   {"dialogue":"Alex : Assemblons les mots de notre histoire pour retrouver le diamant.","xp":20,"exercise":{"id":"diamond-sentence","kind":"fill_blank","prompt":"Remets ces mots en ordre, avec un point final : a diamond / found / I.","skill":"english.sentences.past","verb":"find","accepted":["I found a diamond."]}}
+  ]},
+  {"id":"mysterious-village","title":"Minecraft : The Mysterious Village","theme":"village","steps":[
+   {"dialogue":"Alex : The library is behind the tower. The bridge is next to the river. Où est la bibliothèque ?","xp":10,"exercise":{"id":"village-reading","kind":"fill_blank","prompt":"The library is ___ the tower.","skill":"english.location","accepted":["behind"]}},
+   {"dialogue":"Alex : Interroge le guide sur son voyage d'hier.","xp":15,"exercise":{"id":"village-question","kind":"fill_blank","prompt":"___ you go to the village yesterday?","skill":"english.questions.past","accepted":["Did"]}},
+   {"dialogue":"Alex : The guide went to the library, not the market. Vérifions ta compréhension.","xp":15,"exercise":{"id":"village-guide","kind":"fill_blank","prompt":"Where did the guide go? Réponds avec le lieu seulement.","skill":"english.reading","accepted":["the library","library"]}},
+   {"dialogue":"Alex : Nous savons maintenant trouver le pont.","xp":20,"exercise":{"id":"village-location","kind":"fill_blank","prompt":"Traduis « à côté de » en anglais.","skill":"english.location","accepted":["next to","beside"]}}
+  ]},
+  {"id":"post-match","title":"Football : The Post-Match Interview","theme":"stadium","steps":[
+   {"dialogue":"Alex : Bravo pour le match ! Le journaliste attend tes réponses.","xp":10,"exercise":{"id":"football-win","kind":"past_simple","prompt":"Donne le prétérit de win.","skill":"english.irregular.win","verb":"win","accepted":["won"]}},
+   {"dialogue":"Alex : Le gardien a été excellent aujourd'hui.","xp":10,"exercise":{"id":"football-catch","kind":"fill_blank","prompt":"Our goalkeeper ___ the ball. (catch, au prétérit)","skill":"english.irregular.catch","verb":"catch","accepted":["caught"]}},
+   {"dialogue":"Alex : Pose une question au capitaine.","xp":15,"exercise":{"id":"football-question","kind":"fill_blank","prompt":"___ your team win yesterday?","skill":"english.questions.past","accepted":["Did"]}},
+   {"dialogue":"Alex : We won two–one. Our goalkeeper caught the ball. Utilise le vocabulaire du football.","xp":15,"exercise":{"id":"football-vocabulary","kind":"fill_blank","prompt":"Traduis « gardien de but » en anglais.","skill":"english.football","accepted":["goalkeeper"]}},
+   {"dialogue":"Alex : Termine l'interview avec une phrase au passé.","xp":20,"exercise":{"id":"football-sentence","kind":"fill_blank","prompt":"Remets en ordre, avec un point final : the match / won / We.","skill":"english.sentences.past","verb":"win","accepted":["We won the match."]}}
+  ]}
+ ]
+}

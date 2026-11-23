@@ -1,0 +1,18 @@
+# Optional voice/text overlay. Keys stay in the server environment.
+# Configure a private Speech Engine callback before starting this overlay.
+services:
+  app:
+    environment:
+      AI_PROVIDER: mistral
+      MISTRAL_API_KEY: ${MISTRAL_API_KEY:?Export the Mistral API key}
+      AI_TEXT_MODEL: ${AI_TEXT_MODEL:-mistral-large-4}
+      AI_PROVIDER_DAILY_MICROS: ${AI_PROVIDER_DAILY_MICROS:-2000000}
+      AI_STUDENT_DAILY_MICROS: ${AI_STUDENT_DAILY_MICROS:-2000000}
+      AI_TEXT_RESERVE_MICROS: ${AI_TEXT_RESERVE_MICROS:-10000}
+      VOICE_ENABLED: "true"
+      VOICE_PROVIDER: elevenlabs
+      ELEVENLABS_API_KEY: ${ELEVENLABS_API_KEY:?Export the ElevenLabs API key}
+      ELEVENLABS_ENGINE_ID: ${ELEVENLABS_ENGINE_ID:?Configure the Speech Engine first}
+      AI_VOICE_RESERVE_MICROS: ${AI_VOICE_RESERVE_MICROS:-400000}
+      VOICE_MAX_SECONDS: ${VOICE_MAX_SECONDS:-300}
+      VOICE_DAILY_SECONDS: ${VOICE_DAILY_SECONDS:-900}
